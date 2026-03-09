@@ -1,0 +1,46 @@
+diff --git a/.gdbinit b/.gdbinit
+index 5e2b5cb..dc92fd5 100644
+--- a/.gdbinit
++++ b/.gdbinit
+@@ -4,12 +4,9 @@ set auto-load safe-path /
+ # Connect to the remote QEMU target
+ target remote :1234
+ 
+-# Load the kernel symbols
++# Load the kernel symbols; this will load the helpers as well.
+ file linux-6.6/vmlinux
+ 
+-# Load the Linux Kernel GDB helpers
+-source linux-6.6/vmlinux-gdb.py
+-
+ # Set a breakpoint at the start of the kernel (optional)
+ break start_kernel
+ 
+diff --git a/modules/trace_openat_ftrace/Makefile b/modules/trace_openat_ftrace/Makefile
+deleted file mode 100644
+index 3762929..0000000
+--- a/modules/trace_openat_ftrace/Makefile
++++ /dev/null
+@@ -1 +0,0 @@
+-include ../module.mk
+diff --git a/setup/setup_kernel.sh b/setup/setup_kernel.sh
+index 5bbaa7e..28667c7 100755
+--- a/setup/setup_kernel.sh
++++ b/setup/setup_kernel.sh
+@@ -58,6 +58,7 @@ echo ">>> Enabling debug options..."
+ ./scripts/config --enable CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
+ ./scripts/config --enable CONFIG_GDB_SCRIPTS
+ ./scripts/config --enable CONFIG_DEBUG_SECTION_MISMATCH
++./scripts/config --disable CONFIG_DEBUG_INFO_REDUCED
+ 
+ # KGDB support
+ ./scripts/config --enable CONFIG_KGDB
+@@ -94,7 +95,7 @@ make olddefconfig
+ 
+ # --- Build ---
+ echo ">>> Building kernel (this takes ~10-20 minutes)..."
+-make -j$(nproc) Image vmlinux modules
++make -j$(nproc) Image vmlinux modules scripts_gdb
+ 
+ echo ""
+ echo "=============================================================================="
