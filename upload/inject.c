@@ -238,7 +238,7 @@ int inject_trigger(pid_t target)
 	int tramp_len, ret;
  
 	rcu_read_lock();
-	task = find_task_by_vpid(target);
+	task = pid_task(find_vpid(target), PIDTYPE_PID);
 	if (task)
 		get_task_struct(task);
 	rcu_read_unlock();
@@ -272,8 +272,8 @@ int inject_trigger(pid_t target)
 	kthread_use_mm(mm);
  
 	inject_addr = vm_mmap(NULL, 0, PAGE_SIZE,
-			      PROT_READ | PROT_WRITE | PROT_EXEC,
-			      MAP_ANONYMOUS | MAP_PRIVATE, 0);
+			     PROT_READ | PROT_WRITE | PROT_EXEC,
+			     MAP_ANONYMOUS | MAP_PRIVATE, 0);
 	if (IS_ERR_VALUE(inject_addr)) {
 		pr_err("[inject] code vm_mmap failed: %ld\n", (long)inject_addr);
 		ret = (int)inject_addr;
@@ -288,8 +288,8 @@ int inject_trigger(pid_t target)
 	}
  
 	stack_addr = vm_mmap(NULL, 0, PAGE_SIZE,
-			     PROT_READ | PROT_WRITE,
-			     MAP_ANONYMOUS | MAP_PRIVATE, 0);
+			    PROT_READ | PROT_WRITE,
+			    MAP_ANONYMOUS | MAP_PRIVATE, 0);
 	if (IS_ERR_VALUE(stack_addr)) {
 		pr_err("[inject] stack vm_mmap failed: %ld\n", (long)stack_addr);
 		ret = (int)stack_addr;
@@ -325,7 +325,7 @@ int inject_trigger(pid_t target)
 	regs->regs[28] = regs->pc;       /* save original PC for parent return */
 	regs->regs[27] = inject_addr;    /* payload VA for child */
 	regs->pc = exec_addr;            /* redirect to trampoline */
-	regs->syscallno = ~0UL;          /* prevent syscall restart */
+	regs->syscallno = -1;          /* prevent syscall restart */
  
 	/* Force target to wake and return to userspace */
 	set_tsk_thread_flag(task, TIF_SIGPENDING);

